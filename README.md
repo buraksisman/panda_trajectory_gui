@@ -14,6 +14,15 @@ A Python-based GUI tool for creating, editing, and executing joint-space traject
 
 ---
 
+## 🖼 GUI Preview
+
+![GUI Screenshot](media/gui_screenshot.png)
+
+## 🎬 Demo (GIF)
+
+![Demo of Trajectory GUI](media/demo.gif)
+
+
 ## Required Simulation Setup
 
 To use this GUI in simulation, you need to install the [panda_simulator](https://github.com/justagist/panda_simulator) packages, which include:
