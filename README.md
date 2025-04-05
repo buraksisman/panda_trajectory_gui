@@ -4,17 +4,25 @@ A Python-based GUI tool for creating, editing, and executing joint-space traject
 
 ## Features
 
-- 🖱️ Manual joint control with synchronized sliders and text inputs
-- 🧭 Waypoint management: save, reorder, delete, and preview joint positions
-- 💾 Save and load trajectories as human-readable `.yaml` files
-- ▶️ Play trajectories step-by-step (visual + robot movement)
-- 🚀 Publish full trajectory to `trajectory_controller` for execution
-- 🌐 Launch support for both **simulation** and **real hardware**
-- 👁️ Optional RViz visualization
+- Manual joint control with synchronized sliders and text inputs
+- Waypoint management: save, reorder, delete, and preview joint positions
+- Save and load trajectories as human-readable `.yaml` files
+- Play trajectories step-by-step (visual + robot movement)
+- Publish full trajectory to `trajectory_controller` for execution
+- Launch support for both **simulation** and **real hardware**
+- Optional RViz visualization
 
 ---
 
-## 📦 Installation
+## Required Simulation Setup
+
+To use this GUI in simulation, you need to install the [panda_simulator](https://github.com/justagist/panda_simulator) packages, which include:
+
+- Gazebo model of the Panda robot
+- ROS controllers
+- Robot description (URDF/Xacro)
+
+## Installation
 
 1. Clone the repo into your ROS workspace:
     ```bash
