@@ -1,0 +1,15 @@
+<launch>
+  <arg name="robot" default="sim" doc="Choose 'sim' or 'real'" />
+  <arg name="use_rviz" default="true" doc="Set to 'true' to launch RViz" />
+
+  <!-- Launch simulation if sim -->
+  <include if="$(eval arg('robot') == 'sim')" file="$(find panda_gazebo)/launch/panda_world.launch" />
+
+  <!-- Launch GUI -->
+  <node name="panda_trajectory_gui" pkg="panda_arm_controller" type="panda_trajectory_gui.py" output="screen">
+    <param name="robot_mode" value="$(arg robot)" />
+  </node>
+
+  <!-- Launch RViz from separate launch file -->
+  <include if="$(eval arg('use_rviz') == 'true')" file="$(find panda_arm_controller)/launch/rviz.launch" />
+</launch>
