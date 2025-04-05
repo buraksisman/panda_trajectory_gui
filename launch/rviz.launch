@@ -1,4 +1,4 @@
 <launch>
   <node name="rviz" pkg="rviz" type="rviz" output="screen"
-        args="-d $(find panda_arm_controller)/rviz/panda_gui.rviz" />
+        args="-d $(find panda_trajectory_gui)/rviz/panda_gui.rviz" />
 </launch>

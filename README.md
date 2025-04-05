@@ -48,12 +48,12 @@ To use this GUI in simulation, you need to install the [panda_simulator](https:/
 
 ### Run in Simulation Mode (with Gazebo + RViz)
 ```bash
-roslaunch panda_arm_controller gui.launch robot:=sim use_rviz:=true
+roslaunch panda_trajectory_gui gui.launch robot:=sim use_rviz:=true
 ```
 
 ### Run on Real Robot (no Gazebo, no RViz)
 ```bash
-roslaunch panda_arm_controller gui.launch robot:=real use_rviz:=false
+roslaunch panda_trajectory_gui gui.launch robot:=real use_rviz:=false
 ```
 
 ---
@@ -76,7 +76,7 @@ Use the GUI to load, edit, and replay these trajectories easily.
 ## Package Structure
 
 ```
-panda_arm_controller/
+panda_trajectory_gui/
 ├── scripts/
 │   └── panda_trajectory_gui.py     # Main GUI node
 ├── launch/
@@ -97,7 +97,7 @@ panda_arm_controller/
 
 ### Published Topics
 - `/panda_simulator/motion_controller/arm/joint_commands` (`franka_core_msgs/JointCommand`)
-- `/panda_arm_controller/follow_joint_trajectory` (`trajectory_msgs/JointTrajectory`)
+- `/panda_trajectory_gui/follow_joint_trajectory` (`trajectory_msgs/JointTrajectory`)
 
 ---
 

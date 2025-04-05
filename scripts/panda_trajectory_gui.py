@@ -59,15 +59,25 @@ class PandaTrajectoryGUI:
         # --- ROS Setup ---
         rospy.init_node('panda_joint_gui', anonymous=True)
         self.joint_pub = rospy.Publisher('/panda_simulator/motion_controller/arm/joint_commands', JointCommand, queue_size=10)
-        self.trajectory_pub = rospy.Publisher('/panda_arm_controller/follow_joint_trajectory', JointTrajectory, queue_size=10)
+        self.trajectory_pub = rospy.Publisher('/panda_trajectory_gui/follow_joint_trajectory', JointTrajectory, queue_size=10)
         rospy.Subscriber('/joint_states', JointState, self.joint_state_callback)
 
-        # --- GUI Widgets ---
-        for i, joint in enumerate(JOINT_NAMES):
-            tk.Label(master, text=joint).grid(row=i, column=0)
+        # --- Layout Frames ---
+        joint_frame = tk.LabelFrame(master, text="Joint Control", padx=10, pady=10)
+        joint_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
 
-            entry = tk.Entry(master, width=8)
-            entry.grid(row=i, column=1)
+        wp_frame = tk.LabelFrame(master, text="Waypoint Manager", padx=10, pady=10)
+        wp_frame.grid(row=0, column=1, padx=10, pady=10, sticky="n")
+
+        traj_frame = tk.LabelFrame(master, text="Trajectory Tools", padx=10, pady=10)
+        traj_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+
+        # --- Joint Sliders ---
+        for i, joint in enumerate(JOINT_NAMES):
+            tk.Label(joint_frame, text=joint).grid(row=i, column=0, sticky="e")
+
+            entry = tk.Entry(joint_frame, width=8)
+            entry.grid(row=i, column=1, padx=5)
             entry.insert(0, "0.0")
             entry.bind('<Return>', partial(self.update_slider_from_entry, i))
             entry.bind('<FocusOut>', partial(self.update_slider_from_entry, i))
@@ -76,34 +86,33 @@ class PandaTrajectoryGUI:
             slider_var = tk.DoubleVar()
             self.slider_vars.append(slider_var)
 
-            slider = tk.Scale(
-                master, from_=JOINT_LIMITS[joint][0], to=JOINT_LIMITS[joint][1],
-                resolution=0.01, orient=tk.HORIZONTAL, length=300,
-                variable=slider_var, command=partial(self.update_entry_from_slider, i)
-            )
-            slider.grid(row=i, column=2)
+            slider = tk.Scale(joint_frame, from_=JOINT_LIMITS[joint][0], to=JOINT_LIMITS[joint][1],
+                              resolution=0.01, orient=tk.HORIZONTAL, length=200, variable=slider_var,
+                              command=partial(self.update_entry_from_slider, i))
+            slider.grid(row=i, column=2, padx=5)
             self.sliders.append(slider)
 
-        # --- Control Buttons ---
-        tk.Button(master, text="Send Joint Positions", command=self.send_joint_positions).grid(row=8, column=0, columnspan=3, pady=10)
-        tk.Button(master, text="Save as Waypoint", command=self.save_waypoint).grid(row=9, column=0, columnspan=3, pady=5)
-        tk.Button(master, text="Play All", command=self.play_all_waypoints).grid(row=4, column=4, pady=10)
-        tk.Button(master, text="Load Trajectory", command=self.load_trajectory_from_file).grid(row=11, column=3, columnspan=2, pady=5)
-        tk.Button(master, text="Save Trajectory", command=self.save_trajectory_to_file).grid(row=10, column=3, columnspan=2, pady=10)
-        tk.Button(master, text="Send Trajectory to the Real Robot", command=self.send_full_trajectory).grid(row=12, column=3, columnspan=2, pady=10)
+        tk.Button(joint_frame, text="Send Joint Positions", command=self.send_joint_positions).grid(row=8, column=0, columnspan=3, pady=5)
+        tk.Button(joint_frame, text="Save as Waypoint", command=self.save_waypoint).grid(row=9, column=0, columnspan=3, pady=5)
 
-        # --- Trajectory Naming ---
-        tk.Label(master, text="Trajectory Name:").grid(row=10, column=0, sticky='e', padx=5)
-        self.trajectory_name_entry = tk.Entry(master, width=25)
-        self.trajectory_name_entry.grid(row=10, column=1, columnspan=2, sticky='w')
+        # --- Waypoint Manager ---
+        self.listbox = tk.Listbox(wp_frame, height=10, width=30, exportselection=False)
+        self.listbox.grid(row=0, column=0, columnspan=2, pady=5)
 
-        # --- Waypoint Listbox ---
-        self.listbox = tk.Listbox(master, height=8, width=25)
-        self.listbox.grid(row=0, column=3, rowspan=8, padx=10)
-        tk.Button(master, text="Delete", command=self.delete_waypoint).grid(row=0, column=4)
-        tk.Button(master, text="Move Up", command=self.move_waypoint_up).grid(row=1, column=4)
-        tk.Button(master, text="Move Down", command=self.move_waypoint_down).grid(row=2, column=4)
-        tk.Button(master, text="Set Joint Positions", command=self.set_joint_positions_from_waypoint).grid(row=3, column=4)
+        tk.Button(wp_frame, text="Delete", command=self.delete_waypoint).grid(row=1, column=0, pady=2, sticky="ew")
+        tk.Button(wp_frame, text="Move Up", command=self.move_waypoint_up).grid(row=2, column=0, pady=2, sticky="ew")
+        tk.Button(wp_frame, text="Move Down", command=self.move_waypoint_down).grid(row=3, column=0, pady=2, sticky="ew")
+        tk.Button(wp_frame, text="Set Joint Positions", command=self.set_joint_positions_from_waypoint).grid(row=4, column=0, pady=2, sticky="ew")
+        tk.Button(wp_frame, text="Play All", command=self.play_all_waypoints).grid(row=5, column=0, pady=2, sticky="ew")
+
+        # --- Trajectory Tools ---
+        tk.Label(traj_frame, text="Trajectory Name:").grid(row=0, column=0, sticky="e")
+        self.trajectory_name_entry = tk.Entry(traj_frame, width=25)
+        self.trajectory_name_entry.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+
+        tk.Button(traj_frame, text="Save Trajectory", command=self.save_trajectory_to_file).grid(row=1, column=0, pady=5, sticky="ew")
+        tk.Button(traj_frame, text="Load Trajectory", command=self.load_trajectory_from_file).grid(row=1, column=1, pady=5, sticky="ew")
+        tk.Button(traj_frame, text="Send Trajectory to the Real Robot", command=self.send_full_trajectory).grid(row=2, column=0, columnspan=2, pady=10)
 
         self.master.after(100, self.check_joint_states_received)
 
