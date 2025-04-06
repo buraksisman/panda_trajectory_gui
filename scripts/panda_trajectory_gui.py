@@ -42,6 +42,12 @@ JOINT_LIMITS = {
     "panda_joint7": (-2.8973, 2.8973),
 }
 
+PREDEFINED_POSES = {
+    "Initial Pose": [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785],
+    "Ready Pose": [0.0, -1.0, 0.0, -1.5, 0.0, 2.0, 0.5],
+    "Vertical Up": [0.0, -1.57, 0.0, -1.57, 0.0, 1.57, 0.0],
+}
+
 POSITION_MODE = 1
 
 class PandaTrajectoryGUI:
@@ -95,6 +101,13 @@ class PandaTrajectoryGUI:
         tk.Button(joint_frame, text="Send Joint Positions", command=self.send_joint_positions).grid(row=8, column=0, columnspan=3, pady=5)
         tk.Button(joint_frame, text="Save as Waypoint", command=self.save_waypoint).grid(row=9, column=0, columnspan=3, pady=5)
 
+         # --- Predefined Poses ---
+        pose_frame = tk.LabelFrame(joint_frame, text="Predefined Poses", padx=5, pady=5)
+        pose_frame.grid(row=10, column=0, columnspan=3, pady=10)
+        for i, (label, pose) in enumerate(PREDEFINED_POSES.items()):
+            tk.Button(pose_frame, text=label, width=18, command=partial(self.set_predefined_pose, pose)).grid(row=i, column=0, pady=2)
+
+
         # --- Waypoint Manager ---
         self.listbox = tk.Listbox(wp_frame, height=10, width=30, exportselection=False)
         self.listbox.grid(row=0, column=0, columnspan=2, pady=5)
@@ -128,6 +141,13 @@ class PandaTrajectoryGUI:
                 self.slider_vars[index].set(val)
         except ValueError:
             rospy.logwarn("Invalid input in joint entry.")
+
+    def set_predefined_pose(self, joint_values):
+        for i, val in enumerate(joint_values):
+            self.entries[i].delete(0, tk.END)
+            self.entries[i].insert(0, str(round(val, 4)))
+            self.slider_vars[i].set(val)
+        self.send_joint_positions()
 
     def joint_state_callback(self, msg):
         for name, pos in zip(msg.name, msg.position):
